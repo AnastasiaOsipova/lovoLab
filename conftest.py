@@ -15,3 +15,10 @@ def auth():
         yield
         API.headers.pop("authorization")
         API.refresh_token = None
+
+
+@pytest.fixture(scope="function")
+def delete_content_type():
+    API.headers.pop('Content-Type')
+    yield
+    API.headers['Content-Type'] = "application/json"
