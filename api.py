@@ -15,7 +15,7 @@ class Auth(API):
 
     def __init__(self):
         super(Auth, self).__init__()
-        self.url = f"{self.site_url}/auth"
+        self.url = f"{self.site_url}/v1/auth"
         self.data = {
             "initData": self.init_data
         }
@@ -27,10 +27,10 @@ class Auth(API):
         return response.status_code, response.json()
 
     def put(self):
-        params = {
+        body = {
             "refresh_token": self.refresh_token
         }
-        response = requests.put(self.url, headers=self.headers, params=params)
+        response = requests.put(self.url, headers=self.headers, json=body)
         self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
         self.refresh_token = response.json()['refresh_token']
         return response.status_code, response.json()
@@ -40,10 +40,10 @@ class Profile(API):
 
     def __init__(self, **kwargs):
         super(Profile, self).__init__()
-        self.url = f"{self.site_url}/profile"
+        self.url = f"{self.site_url}/v1/profile"
         self.data = {
             "name": kwargs.get("name", "string"),
-            "birthdate": kwargs.get("birthdate", "2023-06-30"),
+            "birthdate": kwargs.get("birthdate", "2000-06-30"),
             "looking_gender": kwargs.get("looking_gender", 1),
             "gender": kwargs.get("gender", 1),
             "interests": kwargs.get("interests", [
@@ -63,15 +63,27 @@ class Profile(API):
         response = requests.delete(self.url, headers=self.headers)
         return response.status_code, response.json()
 
-    def patch(self, photo_url: list):
-        self.data["photo_url"] = photo_url
-        response = requests.patch(f"{self.url}/photo", headers=self.headers)
+    def patch(self, bio=""):
+        data = {
+            "bio": bio
+        }
+        response = requests.patch(self.url, headers=self.headers, json=data)
         return response.status_code, response.json()
 
-    def post_photos(self, files):
-        headers = self.headers
-        headers["Content-Type"] = "multipart/form-data"
-        response = requests.post(self.url, headers=headers, files=files)
+    def post_photo(self, files):
+        # headers = self.headers
+        # headers.pop("Content-Type") # = "multipart/form-data"
+        response = requests.post(f"{self.url}/photo", headers=self.headers, files=files)
+        return response.status_code, response.json()
+
+    def update_photo(self, files):
+        # headers = self.headers
+        # headers.pop("Content-Type") # = "multipart/form-data"
+        response = requests.patch(f"{self.url}/photo", headers=self.headers, files=files)
+        return response.status_code, response.json()
+
+    def add_interests(self, files):
+        response = requests.put(f"{self.url}/interests", headers=self.headers, files=files)
         return response.status_code, response.json()
 
 
@@ -79,7 +91,7 @@ class Interests(API):
 
     def __init__(self):
         super(Interests, self).__init__()
-        self.url = f"{self.site_url}/common/interests"
+        self.url = f"{self.site_url}/v1/interests"
 
     def get(self):
         response = requests.get(self.url, headers=self.headers)

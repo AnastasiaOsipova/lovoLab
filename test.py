@@ -2,7 +2,7 @@ import allure
 import pytest
 
 from api import *
-from helpers import *
+from helpers import get_photo
 
 
 @allure.feature("Авторизация")
@@ -14,14 +14,16 @@ class TestAuth:
     def test_auth(self):
         with allure.step("Авторизация"):
             status_code, response = self.auth.post()
-            assert status_code == 200
+            assert status_code == 201
             assert "access_token", "refresh_token" in response.keys()
 
     @allure.story("Обновление токена")
     def test_refresh_token(self):
+        status_code, response = self.auth.post()
+        assert status_code == 201
         with allure.step("Обновление токена"):
             status_code, response = self.auth.put()
-            assert status_code == 200
+            assert status_code == 201
             assert "access_token", "refresh_token" in response.keys()
 
 
@@ -42,27 +44,35 @@ class TestProfile:
         with allure.step("Получение профиля"):
             status_code, response = self.profile.get()
             assert status_code == 200
-            assert "name", "birthdate" in response.keys() # , "looking_gender", "gender", "interests"
+            assert "name", "birthdate" in response.keys()
 
-    # @pytest.mark.parametrize("extension", ["jpg", "jpeg", "png", "svg", "webp"])
-    # @allure.story("загрузка фото в профиль")
-    # def test_update_photo(self, auth, extension):
-    #     with allure.step("Авторизация"):
-    #         status_code, response = self.auth.post()
+    # @pytest.mark.parametrize("extension", ["jpg", "jpeg"])
+    @allure.story("загрузка фото в профиль")
+    def test_post_photo(self, auth, delete_content_type):
+        with allure.step("загрузка фото"):
+            photo = get_photo()
+            status_code, response = self.profile.post_photo(files=photo)
+            assert status_code == 202
+
+    # def test_update_photo(self, auth, delete_content_type):
+    #     with allure.step("Обновление фото профиля"):
+    #         photo = get_photo()
+    #         status_code, response = self.profile.update_photo(files=photo)
     #         assert status_code == 200
-    #     with allure.step("загрузка фото"):
-    #         files = helpers.get_photo(extension=extension)
-    #         status_code, response = self.profile.post_photos(files=files)
-    #         assert status_code == 201
+
+    # def test_add_profile_interests(self, auth):
 
     # @allure.story("Обновление профиля")
-    # def test_patch_profile(self):
+    # def test_patch_profile(self, auth):
+    #     with allure.step("Обновление профиля"):
+    #         status_code, response = self.profile.patch(bio="pupupu")
+    #         assert status_code == 200
 
     @allure.story("Удаление профиля")
     def test_delete_profile(self, auth):
         with allure.step("Удаление профиля"):
             status_code, response = self.profile.delete()
-            assert status_code == 200
+            assert status_code == 202
 
 
 @allure.feature("Получение списка интересов")

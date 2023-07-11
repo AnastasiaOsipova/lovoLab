@@ -3,7 +3,7 @@ from api import Auth, API
 
 
 @pytest.fixture(scope="session")
-def auth():
+def auth(request):
     if not "authorization" in API.headers.keys():
         auth = Auth()
         status_code, response = auth.post()
@@ -12,6 +12,26 @@ def auth():
         API.headers["authorization"] = f"Bearer {access_token}"
         API.refresh_token = response["refresh_token"]
 
-        yield
-        API.headers.pop("authorization")
-        API.refresh_token = None
+        # Определение функции финализатора
+        def finalize():
+            API.headers.pop("authorization")
+            API.refresh_token = None
+
+        # Добавление финализатора с помощью addfinalizer()
+        request.addfinalizer(finalize)
+
+        # Возвращается значение True для успешной инициализации auth
+        return True
+
+        # yield
+        # API.headers.pop("authorization")
+        # API.refresh_token = None
+
+
+
+
+@pytest.fixture(scope="function")
+def delete_content_type():
+    API.headers.pop('Content-Type')
+    yield
+    API.headers['Content-Type'] = "application/json"
