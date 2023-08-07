@@ -23,13 +23,6 @@ def auth(request):
         # Возвращается значение True для успешной инициализации auth
         return True
 
-        # yield
-        # API.headers.pop("authorization")
-        # API.refresh_token = None
-
-
-
-
 @pytest.fixture(scope="function")
 def delete_content_type():
     API.headers.pop('Content-Type')

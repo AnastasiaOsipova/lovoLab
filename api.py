@@ -51,19 +51,19 @@ class Profile(API):
             ])
         }
 
-    def get(self):
+    def get_profile(self):
         response = requests.get(self.url, headers=self.headers)
         return response.status_code, response.json()
 
-    def post(self):
+    def post_profile(self):
         response = requests.post(self.url, headers=self.headers, json=self.data)
         return response.status_code, response.json()
 
-    def delete(self):
+    def delete_profile(self):
         response = requests.delete(self.url, headers=self.headers)
         return response.status_code, response.json()
 
-    def patch(self, bio=""):
+    def patch_bio(self, bio=""):
         data = {
             "bio": bio
         }
@@ -71,19 +71,19 @@ class Profile(API):
         return response.status_code, response.json()
 
     def post_photo(self, files):
-        # headers = self.headers
-        # headers.pop("Content-Type") # = "multipart/form-data"
         response = requests.post(f"{self.url}/photo", headers=self.headers, files=files)
         return response.status_code, response.json()
 
     def update_photo(self, files):
-        # headers = self.headers
-        # headers.pop("Content-Type") # = "multipart/form-data"
         response = requests.patch(f"{self.url}/photo", headers=self.headers, files=files)
         return response.status_code, response.json()
 
     def add_interests(self, files):
         response = requests.put(f"{self.url}/interests", headers=self.headers, files=files)
+        return response.status_code, response.json()
+
+    def delete_photo(self, photo_id):
+        response = requests.delete(f"{self.url}/photo/{photo_id}", headers=self.headers)
         return response.status_code, response.json()
 
 
@@ -96,4 +96,3 @@ class Interests(API):
     def get(self):
         response = requests.get(self.url, headers=self.headers)
         return response.status_code, response.json()
-

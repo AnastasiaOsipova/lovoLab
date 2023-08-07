@@ -31,18 +31,19 @@ class TestAuth:
 class TestProfile:
 
     profile = Profile()
+    photo_id = ""
 
     @allure.story("Создание профиля")
     def test_create_profile(self, auth):
         with allure.step("Создание профиля"):
-            status_code, response = self.profile.post()
+            status_code, response = self.profile.post_profile()
             assert status_code == 201
             assert "name", "birthdate" in response.keys()
 
     @allure.story("Получение профиля")
     def test_get_profile(self, auth):
         with allure.step("Получение профиля"):
-            status_code, response = self.profile.get()
+            status_code, response = self.profile.get_profile()
             assert status_code == 200
             assert "name", "birthdate" in response.keys()
 
@@ -53,25 +54,25 @@ class TestProfile:
             photo = get_photo()
             status_code, response = self.profile.post_photo(files=photo)
             assert status_code == 202
+            self.photo_id = response
 
-    # def test_update_photo(self, auth, delete_content_type):
-    #     with allure.step("Обновление фото профиля"):
-    #         photo = get_photo()
-    #         status_code, response = self.profile.update_photo(files=photo)
-    #         assert status_code == 200
-
-    # def test_add_profile_interests(self, auth):
+    @allure.story("Обновление фото в профиле")
+    def test_update_photo(self, auth, delete_content_type):
+        with allure.step("Обновление фото профиля"):
+            photo = get_photo()
+            status_code, response = self.profile.update_photo(files=photo)
+            assert status_code == 200
 
     # @allure.story("Обновление профиля")
     # def test_patch_profile(self, auth):
-    #     with allure.step("Обновление профиля"):
-    #         status_code, response = self.profile.patch(bio="pupupu")
+    #     with allure.step("Добавление био"):
+    #         status_code, response = self.profile.patch_bio(bio="pupupu")
     #         assert status_code == 200
 
     @allure.story("Удаление профиля")
     def test_delete_profile(self, auth):
         with allure.step("Удаление профиля"):
-            status_code, response = self.profile.delete()
+            status_code, response = self.profile.delete_profile()
             assert status_code == 202
 
 
