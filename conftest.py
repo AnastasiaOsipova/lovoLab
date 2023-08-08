@@ -2,7 +2,7 @@ import pytest
 from api import Auth, API
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def auth(request):
     if not "authorization" in API.headers.keys():
         auth = Auth()

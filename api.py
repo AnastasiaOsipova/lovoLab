@@ -46,9 +46,7 @@ class Profile(API):
             "birthdate": kwargs.get("birthdate", "2000-06-30"),
             "looking_gender": kwargs.get("looking_gender", 1),
             "gender": kwargs.get("gender", 1),
-            "interests": kwargs.get("interests", [
-                0
-            ])
+            "interests": kwargs.get("interests", ["21cf46fe-f082-4380-bd02-92d91e094edd"])
         }
 
     def get_profile(self):
@@ -61,7 +59,7 @@ class Profile(API):
 
     def delete_profile(self):
         response = requests.delete(self.url, headers=self.headers)
-        return response.status_code, response.json()
+        return response.status_code, response
 
     def patch_bio(self, bio=""):
         data = {

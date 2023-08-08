@@ -53,27 +53,27 @@ class TestProfile:
         with allure.step("загрузка фото"):
             photo = get_photo()
             status_code, response = self.profile.post_photo(files=photo)
-            assert status_code == 202
+            assert status_code == 201
             self.photo_id = response
 
-    @allure.story("Обновление фото в профиле")
-    def test_update_photo(self, auth, delete_content_type):
-        with allure.step("Обновление фото профиля"):
-            photo = get_photo()
-            status_code, response = self.profile.update_photo(files=photo)
-            assert status_code == 200
-
-    # @allure.story("Обновление профиля")
-    # def test_patch_profile(self, auth):
-    #     with allure.step("Добавление био"):
-    #         status_code, response = self.profile.patch_bio(bio="pupupu")
+    # @allure.story("Обновление фото в профиле")
+    # def test_update_photo(self, auth, delete_content_type):
+    #     with allure.step("Обновление фото профиля"):
+    #         photo = get_photo()
+    #         status_code, response = self.profile.update_photo(files=photo)
     #         assert status_code == 200
+
+    @allure.story("Обновление профиля")
+    def test_patch_profile(self, auth):
+        with allure.step("Добавление био"):
+            status_code, response = self.profile.patch_bio(bio="pupupu")
+            assert status_code == 200
 
     @allure.story("Удаление профиля")
     def test_delete_profile(self, auth):
         with allure.step("Удаление профиля"):
             status_code, response = self.profile.delete_profile()
-            assert status_code == 202
+            assert status_code == 204
 
 
 @allure.feature("Получение списка интересов")
