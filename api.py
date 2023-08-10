@@ -20,19 +20,29 @@ class Auth(API):
             "initData": self.init_data
         }
 
-    def post(self):
+    def post(self, init_data=None):
+        if init_data:
+            self.data = {
+                "initData": init_data
+            }
+
         response = requests.post(self.url, headers=self.headers, json=self.data)
-        self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
-        self.refresh_token = response.json()['refresh_token']
+        if response.status_code == 201:
+            self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
+            self.refresh_token = response.json()['refresh_token']
         return response.status_code, response.json()
 
-    def put(self):
+    def put(self, refresh_token=None):
+        if refresh_token:
+            self.refresh_token = refresh_token
+
         body = {
             "refresh_token": self.refresh_token
         }
         response = requests.put(self.url, headers=self.headers, json=body)
-        self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
-        self.refresh_token = response.json()['refresh_token']
+        if response.status_code == 201:
+            self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
+            self.refresh_token = response.json()['refresh_token']
         return response.status_code, response.json()
 
 
@@ -81,8 +91,9 @@ class Profile(API):
         return response.status_code, response.json()
 
     def delete_photo(self, photo_id):
+        print(photo_id)
         response = requests.delete(f"{self.url}/photo/{photo_id}", headers=self.headers)
-        return response.status_code, response.json()
+        return response.status_code
 
 
 class Interests(API):
