@@ -20,19 +20,29 @@ class Auth(API):
             "initData": self.init_data
         }
 
-    def post(self):
+    def post(self, init_data=None):
+        if init_data:
+            self.data = {
+                "initData": init_data
+            }
+
         response = requests.post(self.url, headers=self.headers, json=self.data)
-        self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
-        self.refresh_token = response.json()['refresh_token']
+        if response.status_code == 201:
+            self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
+            self.refresh_token = response.json()['refresh_token']
         return response.status_code, response.json()
 
-    def put(self):
+    def put(self, refresh_token=None):
+        if refresh_token:
+            self.refresh_token = refresh_token
+
         body = {
             "refresh_token": self.refresh_token
         }
         response = requests.put(self.url, headers=self.headers, json=body)
-        self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
-        self.refresh_token = response.json()['refresh_token']
+        if response.status_code == 201:
+            self.headers["authorization"] = f"Bearer {response.json()['access_token']}"
+            self.refresh_token = response.json()['refresh_token']
         return response.status_code, response.json()
 
 
@@ -46,24 +56,22 @@ class Profile(API):
             "birthdate": kwargs.get("birthdate", "2000-06-30"),
             "looking_gender": kwargs.get("looking_gender", 1),
             "gender": kwargs.get("gender", 1),
-            "interests": kwargs.get("interests", [
-                0
-            ])
+            "interests": kwargs.get("interests", ["21cf46fe-f082-4380-bd02-92d91e094edd"])
         }
 
-    def get(self):
+    def get_profile(self):
         response = requests.get(self.url, headers=self.headers)
         return response.status_code, response.json()
 
-    def post(self):
+    def post_profile(self):
         response = requests.post(self.url, headers=self.headers, json=self.data)
         return response.status_code, response.json()
 
-    def delete(self):
+    def delete_profile(self):
         response = requests.delete(self.url, headers=self.headers)
-        return response.status_code, response.json()
+        return response.status_code, response
 
-    def patch(self, bio=""):
+    def patch_bio(self, bio=""):
         data = {
             "bio": bio
         }
@@ -71,20 +79,21 @@ class Profile(API):
         return response.status_code, response.json()
 
     def post_photo(self, files):
-        # headers = self.headers
-        # headers.pop("Content-Type") # = "multipart/form-data"
         response = requests.post(f"{self.url}/photo", headers=self.headers, files=files)
         return response.status_code, response.json()
 
     def update_photo(self, files):
-        # headers = self.headers
-        # headers.pop("Content-Type") # = "multipart/form-data"
         response = requests.patch(f"{self.url}/photo", headers=self.headers, files=files)
         return response.status_code, response.json()
 
     def add_interests(self, files):
         response = requests.put(f"{self.url}/interests", headers=self.headers, files=files)
         return response.status_code, response.json()
+
+    def delete_photo(self, photo_id):
+        print(photo_id)
+        response = requests.delete(f"{self.url}/photo/{photo_id}", headers=self.headers)
+        return response.status_code
 
 
 class Interests(API):
@@ -96,4 +105,3 @@ class Interests(API):
     def get(self):
         response = requests.get(self.url, headers=self.headers)
         return response.status_code, response.json()
-

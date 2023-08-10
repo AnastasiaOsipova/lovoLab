@@ -1,8 +1,8 @@
 import pytest
-from api import Auth, API
+from api import Auth, API, Profile
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def auth(request):
     if not "authorization" in API.headers.keys():
         auth = Auth()
@@ -23,15 +23,16 @@ def auth(request):
         # Возвращается значение True для успешной инициализации auth
         return True
 
-        # yield
-        # API.headers.pop("authorization")
-        # API.refresh_token = None
-
-
-
-
 @pytest.fixture(scope="function")
 def delete_content_type():
     API.headers.pop('Content-Type')
     yield
     API.headers['Content-Type'] = "application/json"
+
+@pytest.fixture()
+def delete_photo(photos_ids):
+    profile = Profile()
+    for photo_id in photos_ids:
+        status_code = profile.delete_photo(photo_id)
+        assert status_code == 204
+
